@@ -1,6 +1,7 @@
 import heapq
 import os
 import pickle
+from collections import OrderedDict
 
 class Node:
     def __init__(self, char, freq):
@@ -52,7 +53,7 @@ def compress_file(input_file, output_file):
     huffman_tree = nodes[0]
     
     # Build prefix code dictionary
-    prefix_code_dict = {}
+    prefix_code_dict = OrderedDict()
     build_prefix_code(huffman_tree, prefix_code_dict)
     
     # Compress text
