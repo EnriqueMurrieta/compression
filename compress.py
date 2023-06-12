@@ -59,6 +59,10 @@ def compress_file(input_file, output_file):
     # Compress text
     compressed_text = ''.join(prefix_code_dict[char] for char in text)
     
+    # Pad compressed text to multiple of 8
+    padding = 8 - len(compressed_text) % 8
+    compressed_text += '0' * padding
+    
     # Convert compressed text to bytes
     compressed_bytes = bytearray()
     for i in range(0, len(compressed_text), 8):
