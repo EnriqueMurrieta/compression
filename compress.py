@@ -34,14 +34,14 @@ def compress_file(input_file, output_file):
     # Read input file
     with open(input_file, 'r') as file:
         text = file.read()
-    
+
     # Build frequency table
     frequency_table = build_frequency_table(text)
-    
+
     # Build Huffman tree
     nodes = [Node(char, freq) for char, freq in frequency_table.items()]
     heapq.heapify(nodes)
-    
+
     while len(nodes) > 1:
         left_child = heapq.heappop(nodes)
         right_child = heapq.heappop(nodes)
@@ -49,31 +49,39 @@ def compress_file(input_file, output_file):
         merged_node.left = left_child
         merged_node.right = right_child
         heapq.heappush(nodes, merged_node)
-    
+
     huffman_tree = nodes[0]
-    
+
     # Build prefix code dictionary
     prefix_code_dict = OrderedDict()
     build_prefix_code(huffman_tree, prefix_code_dict)
-    
+
     # Compress text
     compressed_text = ''.join(prefix_code_dict[char] for char in text)
-    
-    # Pad compressed text to multiple of 8
-    padding = 8 - len(compressed_text) % 8
-    compressed_text += '0' * padding
-    
+
+    # Calculate padding bits
+    padding_bits = 8 - len(compressed_text) % 8
+    if padding_bits == 8:
+        padding_bits = 0
+
+    # Add padding bits to the compressed text
+    compressed_text += '0' * padding_bits
+
     # Convert compressed text to bytes
     compressed_bytes = bytearray()
     for i in range(0, len(compressed_text), 8):
         byte = compressed_text[i:i + 8]
         compressed_bytes.append(int(byte, 2))
-    
-    # Save codebook to a separate file
+
+    # Save codebook with padding information to a separate file
+    codebook = {
+        'prefix_code_dict': prefix_code_dict,
+        'padding_bits': padding_bits
+    }
     codebook_file = os.path.splitext(output_file)[0] + ".pkl"
     with open(codebook_file, 'wb') as file:
-        pickle.dump(prefix_code_dict, file)
-    
+        pickle.dump(codebook, file)
+
     # Write compressed bytes to output file
     with open(output_file, 'wb') as file:
         file.write(bytes(compressed_bytes))
