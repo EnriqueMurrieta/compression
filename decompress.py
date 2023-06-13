@@ -1,17 +1,14 @@
 import os
 import pickle
 
-def decompress_file(input_file, output_file, codebook_file):
-    # Read compressed file as bytes
+def decompress_file(input_file, output_file):
+    # Read combined data from file
     with open(input_file, 'rb') as file:
-        compressed_bytes = file.read()
-
-    # Load codebook from codebook file
-    with open(codebook_file, 'rb') as file:
         codebook = pickle.load(file)
 
     prefix_code_dict = codebook['prefix_code_dict']
     padding_bits = codebook['padding_bits']
+    compressed_bytes = codebook['compressed_bytes']
 
     # Convert bytes to binary string
     compressed_text = ''.join(format(byte, '08b') for byte in compressed_bytes)
@@ -37,7 +34,6 @@ def decompress_file(input_file, output_file, codebook_file):
         file.write(decompressed_text)
 
 # Usage example
-input_file = "compressed.bin"
+input_file = "compressed.pkl"
 output_file = "decompressed.txt"
-codebook_file = "compressed.pkl"
-decompress_file(input_file, output_file, codebook_file)
+decompress_file(input_file, output_file)

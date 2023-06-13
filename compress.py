@@ -73,20 +73,18 @@ def compress_file(input_file, output_file):
         byte = compressed_text[i:i + 8]
         compressed_bytes.append(int(byte, 2))
 
-    # Save codebook with padding information to a separate file
+    # Combine codebook and padding information
     codebook = {
         'prefix_code_dict': prefix_code_dict,
-        'padding_bits': padding_bits
+        'padding_bits': padding_bits,
+        'compressed_bytes': compressed_bytes
     }
-    codebook_file = os.path.splitext(output_file)[0] + ".pkl"
-    with open(codebook_file, 'wb') as file:
-        pickle.dump(codebook, file)
 
-    # Write compressed bytes to output file
+    # Write combined data to output file
     with open(output_file, 'wb') as file:
-        file.write(bytes(compressed_bytes))
+        pickle.dump(codebook, file)
 
 # Usage example
 input_file = "input.txt"
-output_file = "compressed.bin"
+output_file = "compressed.pkl"
 compress_file(input_file, output_file)
